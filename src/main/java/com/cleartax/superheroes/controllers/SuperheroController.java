@@ -38,6 +38,12 @@ public class SuperheroController {
         return queueService.getAllMessagesInQueue();
     }
 
+    @PostMapping("/push_superhero_to_queue/{super_hero_name}")
+    public String pushSuperhero(@PathVariable String super_hero_name) {
+        superheroService.pushSuperheroToQueue(super_hero_name, sqsConfig.getQueueUrl());
+        return "The superhero has been pushed to the queue.";
+    }
+
     @PostMapping("/push_superheroes_to_queue")
     public String pushAllSuperheroes() {
         superheroService.pushAllSuperheroesToQueue(sqsConfig.getQueueUrl());

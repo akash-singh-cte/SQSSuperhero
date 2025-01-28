@@ -1,6 +1,7 @@
 package com.cleartax.superheroes.services;
 
 import com.cleartax.superheroes.config.SqsConfig;
+import com.cleartax.superheroes.repos.SuperheroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ public class SuperheroConsumer {
   private SqsConfig sqsConfig;
   @Autowired
   private SqsClient sqsClient;
+  @Autowired
+  private SuperheroRepository superheroRepository;
+
 
   @Scheduled(fixedDelay = 10000)
   public void consumeSuperhero() {
@@ -28,6 +32,12 @@ public class SuperheroConsumer {
         String body = message.body();
         System.out.println("Queue Message: " + body);
 
+        superheroRepository.findByName(body).ifPresent(superhero -> {
+          String updatedName = superhero.getName() + " Updated";
+          superhero.setName(updatedName);
+          superheroRepository.save(superhero); // Save the updated superhero back to the database
+          System.out.println("Updated Superhero: " + updatedName);
+        });
 
         sqsClient.deleteMessage(DeleteMessageRequest.builder()
                 .queueUrl(sqsConfig.getQueueUrl())

@@ -44,6 +44,15 @@ public class SuperheroService {
         }
     }
 
+    public void pushSuperheroToQueue(String superHeroName, String queueUrl) {
+            String messageBody = superHeroName;
+            SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
+                    .queueUrl(queueUrl)
+                    .messageBody(messageBody)
+                    .build();
+            sqsClient.sendMessage(sendMessageRequest);
+    }
+
     public void pushAllSuperheroesToQueue(String queueUrl) {
         List<Superhero> superheroes = superheroRepository.findAll();
         for (Superhero superhero : superheroes) {
